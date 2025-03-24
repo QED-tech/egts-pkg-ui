@@ -52,7 +52,7 @@ func (p *DebugPackage) mapFields() *DebugPackage {
 		Description: `Параметр PRV содержит значение 0x01. Значение данного параметра инкрементируется каждый раз при внесении изменений в структуру заголовка.
 Поле PR (Priority) определяет приоритет маршрутизации данного пакета`,
 		Value: fmt.Sprintf(
-			`PRF = %s | RTE = %s | ENA = %s | CMP = %s| PR = %s`,
+			`PRF = %s RTE = %s ENA = %s CMP = %s PR = %s`,
 			p.EGTSPackage.Prefix,
 			p.EGTSPackage.Route,
 			p.EGTSPackage.EncryptionAlg,

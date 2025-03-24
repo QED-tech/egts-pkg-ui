@@ -26,11 +26,15 @@ function App() {
             0100020b002300020001871800010011e70300000202101500b6739d1b4fba3a9ed227bc350000000000000000003b07
           </pre>
         </div>
-        <input
-          className="hex-input"
+        <textarea
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 outline-none text-sm resize-none overflow-hidden"
           value={hexString}
           onChange={(e) => setHexString(e.target.value)}
-          placeholder="EGTS Package hex string"
+          onInput={(e) => {
+            e.target.style.height = "auto"; // Сброс высоты перед расчетом
+            e.target.style.height = e.target.scrollHeight + "px"; // Установка новой высоты
+          }}
+          placeholder="Введите EGTS пакет в HEX формате"
         />
 
         <button className="text-white" onClick={handleParse}>
