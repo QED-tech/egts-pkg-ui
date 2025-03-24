@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import React, { useState } from "react";
+import { decodeEgts } from "./services/egts";
+import ViewParsedPgk from "./components/ViewParsedPkg";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [hexString, setHexString] = useState("");
+  const [parsedPackage, setParsedPackage] = useState(null);
+
+  const handleParse = async () => {
+    const parsedEgts = await decodeEgts(hexString);
+    console.log(parsedEgts.data);
+    setParsedPackage(parsedEgts.data);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="app">
+      <div className="app-header">
+        <div class="text-center text-5xl font-extrabold leading-none tracking-tight m-8">
+          <span class="text-gray-900">EGTS Debug</span>
+        </div>
+
+        <div className="m-8">
+          <pre>
+            Пример пакета:
+            0100020b002300020001871800010011e70300000202101500b6739d1b4fba3a9ed227bc350000000000000000003b07
+          </pre>
+        </div>
+        <input
+          className="hex-input"
+          value={hexString}
+          onChange={(e) => setHexString(e.target.value)}
+          placeholder="EGTS Package hex string"
+        />
+
+        <button className="text-white" onClick={handleParse}>
+          Decode
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      {parsedPackage && (
+        <ViewParsedPgk parsedPackage={parsedPackage} hexString={hexString} />
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
