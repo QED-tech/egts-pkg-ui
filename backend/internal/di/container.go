@@ -11,14 +11,15 @@ type Adapters struct {
 
 type Container struct {
 	Adapters *Adapters
-	Usecases *usecase.Usecase
 }
 
 func NewContainer() *Container {
+	
+	usecases := usecase.NewUsecase()
+
 	return &Container{
 		Adapters: &Adapters{
-			HTTP: http.NewHandler(),
+			HTTP: http.NewHandler(usecases),
 		},
-		Usecases: usecase.NewUsecase(),
 	}
 }

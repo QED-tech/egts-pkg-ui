@@ -12,42 +12,63 @@ type egtsField struct {
 	Description string `json:"description"`
 	Value       string `json:"value"`
 	BytesSize   int    `json:"bytes_size"`
+	Hex         string `json:"hex"`
 }
 
 type DebugPackage struct {
-	EGTSPackage      *egts.Package `json:"-"`
-	ProtocolVersion  egtsField     `json:"PRV"`
-	SecurityKeyID    egtsField     `json:"SKID"`
-	HeaderFlags      egtsField     `json:"PRF RTE ENA CMP PR"`
-	HeaderLength     egtsField     `json:"HL"`
-	FrameDataLength  egtsField     `json:"FDL"`
-	PacketIdentifier egtsField     `json:"PID"`
-	PacketType       egtsField     `json:"PT"`
+	EGTSPackage *egts.Package `json:"-"`
+	hexString   string        `json:"-"`
+
+	ProtocolVersion  egtsField `json:"PRV"`
+	SecurityKeyID    egtsField `json:"SKID"`
+	HeaderFlags      egtsField `json:"PRF RTE ENA CMP PR"`
+	HeaderLength     egtsField `json:"HL"`
+	HeaderEncoding   egtsField `json:"HE"`
+	FrameDataLength  egtsField `json:"FDL"`
+	PacketIdentifier egtsField `json:"PID"`
+	PacketType       egtsField `json:"PT"`
 
 	HeaderCheckSum            egtsField `json:"HCS"`
 	ServicesFrameData         egtsField `json:"SFRD"`
 	ServicesFrameDataCheckSum egtsField `json:"SFRCS"`
 }
 
-func NewDebugPackage(egtsPackage *egts.Package) *DebugPackage {
+func NewDebugPackage(egtsPackage *egts.Package, hexString string) *DebugPackage {
 	debugPkg := &DebugPackage{
 		EGTSPackage: egtsPackage,
+		hexString:   hexString,
 	}
 
 	return debugPkg.mapFields()
 }
 
+func hexStringGenerator(hexString string) func(int) string {
+	var offset int
+
+	return func(bytesSize int) string {
+		current := hexString[offset : offset+bytesSize*2]
+		offset += bytesSize * 2
+		return current
+	}
+}
+
 func (p *DebugPackage) mapFields() *DebugPackage {
+	hexGenerator := hexStringGenerator(p.hexString)
+
 	p.ProtocolVersion = egtsField{
 		Description: "Protocol version",
 		Value:       strconv.Itoa(int(p.EGTSPackage.ProtocolVersion)),
 		BytesSize:   1,
+		Hex:         hexGenerator(1),
 	}
+
 	p.SecurityKeyID = egtsField{
 		Description: "Security Key ID | Параметр SKID определяет идентификатор ключа, используемого при шифровании.",
 		Value:       strconv.Itoa(int(p.EGTSPackage.SecurityKeyID)),
 		BytesSize:   1,
+		Hex:         hexGenerator(1),
 	}
+
 	p.HeaderFlags = egtsField{
 		Description: `Параметр PRV содержит значение 0x01. Значение данного параметра инкрементируется каждый раз при внесении изменений в структуру заголовка.
 Поле PR (Priority) определяет приоритет маршрутизации данного пакета`,
@@ -60,17 +81,28 @@ func (p *DebugPackage) mapFields() *DebugPackage {
 			p.EGTSPackage.Priority,
 		),
 		BytesSize: 1,
+		Hex:       hexGenerator(1),
 	}
+
 	p.HeaderLength = egtsField{
 		Description: `Поле HL — длина заголовка транспортного уровня в байтах с учетом байта контрольной суммы (поля HCS).`,
 		Value:       strconv.Itoa(int(p.EGTSPackage.HeaderLength)),
 		BytesSize:   1,
+		Hex:         hexGenerator(1),
+	}
+
+	p.HeaderEncoding = egtsField{
+		Description: `Поле НЕ определяет применяемый метод кодирования следующей за данным параметром части заголовка транспортного уровня.`,
+		Value:       strconv.Itoa(int(p.EGTSPackage.HeaderEncoding)),
+		BytesSize:   1,
+		Hex:         hexGenerator(1),
 	}
 
 	p.FrameDataLength = egtsField{
 		Description: `Поле FDL определяет размер в байтах поля данных SFRD, содержащего информацию протокола уровня поддержки услуг.`,
 		Value:       strconv.Itoa(int(p.EGTSPackage.FrameDataLength)),
 		BytesSize:   2,
+		Hex:         hexGenerator(2),
 	}
 
 	p.PacketIdentifier = egtsField{
@@ -79,6 +111,7 @@ func (p *DebugPackage) mapFields() *DebugPackage {
 диапазоне от 0 до 65535, т. е. при достижении значения 65535 следующее значение 0.`,
 		Value:     strconv.Itoa(int(p.EGTSPackage.PacketIdentifier)),
 		BytesSize: 2,
+		Hex:       hexGenerator(2),
 	}
 
 	p.PacketType = egtsField{
@@ -88,6 +121,7 @@ func (p *DebugPackage) mapFields() *DebugPackage {
 - 2 — EGTS_PT_SIGNED_APPDATA (пакет, содержащий данные протокола уровня поддержки услуг с цифровой подписью).`,
 		Value:     strconv.Itoa(int(p.EGTSPackage.PacketType)),
 		BytesSize: 1,
+		Hex:       hexGenerator(1),
 	}
 
 	p.HeaderCheckSum = egtsField{
@@ -96,6 +130,7 @@ func (p *DebugPackage) mapFields() *DebugPackage {
 применяется алгоритм CRC-8.`,
 		Value:     strconv.Itoa(int(p.EGTSPackage.HeaderCheckSum)),
 		BytesSize: 1,
+		Hex:       hexGenerator(1),
 	}
 
 	serviceFrameData, _ := json.Marshal(p.EGTSPackage.ServicesFrameData)
@@ -105,6 +140,7 @@ func (p *DebugPackage) mapFields() *DebugPackage {
 уровня поддержки услуг.`,
 		Value:     string(serviceFrameData),
 		BytesSize: int(p.EGTSPackage.FrameDataLength),
+		Hex:       hexGenerator(int(p.EGTSPackage.FrameDataLength)),
 	}
 
 	p.ServicesFrameDataCheckSum = egtsField{
@@ -113,6 +149,7 @@ func (p *DebugPackage) mapFields() *DebugPackage {
 если есть поле SFRD.`,
 		Value:     strconv.Itoa(int(p.EGTSPackage.ServicesFrameDataCheckSum)),
 		BytesSize: 2,
+		Hex:       hexGenerator(2),
 	}
 
 	return p

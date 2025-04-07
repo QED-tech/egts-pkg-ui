@@ -9,7 +9,7 @@ import (
 	"github.com/qed-tech/egts-pkg-debugger/pkg/server"
 )
 
-func (h *Handler) Decode(c echo.Context) error {
+func (h Handler) Decode(c echo.Context) error {
 	pkg := c.QueryParam("package")
 	if pkg == "" {
 		return c.JSON(http.StatusBadRequest, server.Problem{
@@ -18,7 +18,7 @@ func (h *Handler) Decode(c echo.Context) error {
 		})
 	}
 
-	out, err := h.usecases.DecodeUsecase.Decode(pkg)
+	out, err := h.usecases.DecodeUsecase.Decode(c.Request().Context(), pkg)
 	if err != nil {
 		switch {
 		case errors.Is(err, usecase.ErrInvalidHexString):

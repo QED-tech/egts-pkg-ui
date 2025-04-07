@@ -1,23 +1,23 @@
 import "./App.css";
-import React, { useState } from "react";
-import { decodeEgts } from "./services/egts";
-import ViewParsedPgk from "./components/ViewParsedPkg";
+import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router";
 
 function App() {
   const [hexString, setHexString] = useState("");
-  const [parsedPackage, setParsedPackage] = useState(null);
+  const textAreaRef = useRef(null);
 
-  const handleParse = async () => {
-    const parsedEgts = await decodeEgts(hexString);
-    console.log(parsedEgts.data);
-    setParsedPackage(parsedEgts.data);
-  };
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height =
+        textAreaRef.current.scrollHeight + "px";
+    }
+  }, [hexString]);
 
   return (
     <div className="app">
       <div className="app-header">
-        <div class="text-center text-5xl font-extrabold leading-none tracking-tight m-8">
-          <span class="text-gray-900">EGTS Debug</span>
+        <div className="text-center text-5xl font-extrabold leading-none tracking-tight m-8">
+          <span className="text-gray-900">EGTS Decode</span>
         </div>
 
         <div className="m-8">
@@ -27,24 +27,20 @@ function App() {
           </pre>
         </div>
         <textarea
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 outline-none text-sm resize-none overflow-hidden"
+          className="h-auto w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300 outline-none text-sm resize-none overflow-hidden"
           value={hexString}
+          ref={textAreaRef}
           onChange={(e) => setHexString(e.target.value)}
           onInput={(e) => {
-            e.target.style.height = "auto"; // Сброс высоты перед расчетом
-            e.target.style.height = e.target.scrollHeight + "px"; // Установка новой высоты
+            e.target.style.height = e.target.scrollHeight + "px";
           }}
           placeholder="Введите EGTS пакет в HEX формате"
         />
 
-        <button className="text-white" onClick={handleParse}>
-          Decode
-        </button>
+        <Link to={{ pathname: "/hex", search: `?pkg=${hexString}` }}>
+          <button className="text-white">Decode</button>
+        </Link>
       </div>
-
-      {parsedPackage && (
-        <ViewParsedPgk parsedPackage={parsedPackage} hexString={hexString} />
-      )}
     </div>
   );
 }

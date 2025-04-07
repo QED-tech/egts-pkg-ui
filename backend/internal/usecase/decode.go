@@ -1,27 +1,33 @@
 package usecase
 
 import (
+	"context"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"log/slog"
 
 	"github.com/kuznetsovin/egts-protocol/libs/egts"
 	"github.com/qed-tech/egts-pkg-debugger/internal/entity"
+	"github.com/qed-tech/egts-pkg-debugger/internal/service"
 )
 
 type DecodeUsecase struct {
+	historySaver service.HistorySaver
 }
 
-func NewDecodeUsecase() *DecodeUsecase {
-	return &DecodeUsecase{}
+func NewDecodeUsecase(historySaver service.HistorySaver) *DecodeUsecase {
+	return &DecodeUsecase{
+		historySaver: historySaver,
+	}
 }
 
 var (
 	ErrInvalidHexString = errors.New("invalid hex string")
 )
 
-func (u *DecodeUsecase) Decode(pkg string) (*entity.DebugPackage, error) {
-	bytes, err := hex.DecodeString(pkg)
+func (u *DecodeUsecase) Decode(ctx context.Context, hexString string) (*entity.DebugPackage, error) {
+	bytes, err := hex.DecodeString(hexString)
 	if err != nil {
 		return nil, ErrInvalidHexString
 	}
@@ -32,5 +38,9 @@ func (u *DecodeUsecase) Decode(pkg string) (*entity.DebugPackage, error) {
 		return nil, fmt.Errorf("failed to decode bytes to egts package, err: %v", err)
 	}
 
-	return entity.NewDebugPackage(&egtsPackage), nil
+	if err := u.historySaver.Save(hexString); err != nil {
+		slog.WarnContext(ctx, "failed to save history", slog.Any("error", err))
+	}
+
+	return entity.NewDebugPackage(&egtsPackage, hexString), nil
 }
