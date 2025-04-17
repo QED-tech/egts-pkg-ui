@@ -28,7 +28,8 @@ func (a *Application) Run() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS())
 
-	e.GET("/api/v1/egts-decode", a.Container.Adapters.HTTP.Decode)
+	e.GET("/api/v1/egts/decode", a.Container.Adapters.HTTP.Decode)
+	e.GET("/api/v1/egts/history", a.Container.Adapters.HTTP.GetHistory)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()

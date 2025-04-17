@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"log/slog"
 	"os"
 
@@ -9,7 +10,11 @@ import (
 )
 
 func main() {
-	container := di.NewContainer()
+	container, err := di.NewContainer()
+	if err != nil {
+		log.Fatal("failed to init container")
+	}
+
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 	slog.SetDefault(logger)

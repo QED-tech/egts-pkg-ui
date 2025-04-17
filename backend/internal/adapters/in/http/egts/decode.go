@@ -1,4 +1,4 @@
-package http
+package egts
 
 import (
 	"errors"
@@ -18,7 +18,7 @@ func (h Handler) Decode(c echo.Context) error {
 		})
 	}
 
-	out, err := h.usecases.DecodeUsecase.Decode(c.Request().Context(), pkg)
+	out, err := h.decodeUsecase.Decode(c.Request().Context(), pkg)
 	if err != nil {
 		switch {
 		case errors.Is(err, usecase.ErrInvalidHexString):

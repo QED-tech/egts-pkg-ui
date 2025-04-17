@@ -1,6 +1,7 @@
 import "./App.css";
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
+import History from "./components/egts/History.jsx";
 
 function App() {
   const [hexString, setHexString] = useState("");
@@ -22,7 +23,7 @@ function App() {
 
         <div className="m-8">
           <pre>
-            Пример пакета:
+            Пример пакета EGTS:
             0100020b002300020001871800010011e70300000202101500b6739d1b4fba3a9ed227bc350000000000000000003b07
           </pre>
         </div>
@@ -41,6 +42,8 @@ function App() {
           <button className="text-white">Decode</button>
         </Link>
       </div>
+
+      <History />
     </div>
   );
 }

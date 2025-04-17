@@ -1,25 +1,68 @@
 package di
 
 import (
-	"github.com/qed-tech/egts-pkg-debugger/internal/adapters/http"
+	"github.com/qed-tech/egts-pkg-debugger/internal/adapters/in/http/egts"
+	"github.com/qed-tech/egts-pkg-debugger/internal/adapters/out/postgres"
+	"github.com/qed-tech/egts-pkg-debugger/internal/repository"
+	"github.com/qed-tech/egts-pkg-debugger/internal/service"
 	"github.com/qed-tech/egts-pkg-debugger/internal/usecase"
+	postgresdriver "gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type Adapters struct {
-	HTTP *http.Handler
+	HTTP *egts.Handler
 }
 
 type Container struct {
 	Adapters *Adapters
+	Database *gorm.DB
 }
 
-func NewContainer() *Container {
-	
-	usecases := usecase.NewUsecase()
+type Repositories struct {
+	HistoryRepository repository.HistoryRepository
+}
 
-	return &Container{
+type Usecase struct {
+	DecodeUsecase     *usecase.DecodeUsecase
+	GetHistoryUsecase *usecase.GetHistoryUsecase
+}
+
+func NewUsecase(repos Repositories) *Usecase {
+	return &Usecase{
+		DecodeUsecase: usecase.NewDecodeUsecase(
+			service.NewHistorySaver(),
+		),
+		GetHistoryUsecase: usecase.NewGetHistoryUsecase(repos.HistoryRepository),
+	}
+}
+
+func NewContainer() (*Container, error) {
+	db, err := initDatabase()
+	if err != nil {
+		return nil, err
+	}
+
+	repositories := Repositories{
+		HistoryRepository: postgres.NewHistoryRepository(db),
+	}
+
+	usecases := NewUsecase(repositories)
+
+	container := &Container{
+		Database: db,
 		Adapters: &Adapters{
-			HTTP: http.NewHandler(usecases),
+			HTTP: egts.NewHandler(
+				usecases.DecodeUsecase,
+				usecases.GetHistoryUsecase,
+			),
 		},
 	}
+
+	return container, nil
+}
+
+func initDatabase() (*gorm.DB, error) {
+	dsn := "host=localhost user=postgres password=postgres dbname=egts port=5432 sslmode=disable TimeZone=UTC"
+	return gorm.Open(postgresdriver.Open(dsn), &gorm.Config{})
 }
