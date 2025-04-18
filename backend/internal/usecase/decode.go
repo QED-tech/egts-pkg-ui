@@ -38,7 +38,7 @@ func (u *DecodeUsecase) Decode(ctx context.Context, hexString string) (*entity.D
 		return nil, fmt.Errorf("failed to decode bytes to egts package, err: %v", err)
 	}
 
-	if err := u.historySaver.Save(hexString); err != nil {
+	if err := u.historySaver.Save(ctx, hexString); err != nil {
 		slog.WarnContext(ctx, "failed to save history", slog.Any("error", err))
 	}
 

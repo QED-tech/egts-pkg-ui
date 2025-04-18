@@ -28,19 +28,18 @@ func (a *Application) Run() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS())
 
-	e.GET("/api/v1/egts/decode", a.Container.Adapters.HTTP.Decode)
-	e.GET("/api/v1/egts/history", a.Container.Adapters.HTTP.GetHistory)
+	e.GET("/api/v1/egts/decode", a.Container.Adapters.EGTS.Decode)
+	e.GET("/api/v1/egts/history", a.Container.Adapters.EGTS.GetHistory)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
-	// Start server
+
 	go func() {
 		if err := e.Start(":9090"); err != nil && err != http.ErrServerClosed {
 			e.Logger.Fatal("shutting down the server")
 		}
 	}()
 
-	// Wait for interrupt signal to gracefully shut down the server with a timeout of 10 seconds.
 	<-ctx.Done()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

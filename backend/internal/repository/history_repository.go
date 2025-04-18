@@ -10,4 +10,5 @@ import (
 type HistoryRepository interface {
 	Conn() *gorm.DB
 	GetHistory(ctx context.Context, db *gorm.DB, limit int) ([]*entity.HistoryRecord, error)
+	WriteHistory(ctx context.Context, historyRecord *entity.HistoryRecord) error
 }

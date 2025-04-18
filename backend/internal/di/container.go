@@ -10,13 +10,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type Adapters struct {
-	HTTP *egts.Handler
-}
-
 type Container struct {
 	Adapters *Adapters
-	Database *gorm.DB
+}
+
+type Adapters struct {
+	EGTS *egts.Handler
 }
 
 type Repositories struct {
@@ -31,7 +30,7 @@ type Usecase struct {
 func NewUsecase(repos Repositories) *Usecase {
 	return &Usecase{
 		DecodeUsecase: usecase.NewDecodeUsecase(
-			service.NewHistorySaver(),
+			service.NewHistorySaver(repos.HistoryRepository),
 		),
 		GetHistoryUsecase: usecase.NewGetHistoryUsecase(repos.HistoryRepository),
 	}
@@ -50,9 +49,8 @@ func NewContainer() (*Container, error) {
 	usecases := NewUsecase(repositories)
 
 	container := &Container{
-		Database: db,
 		Adapters: &Adapters{
-			HTTP: egts.NewHandler(
+			EGTS: egts.NewHandler(
 				usecases.DecodeUsecase,
 				usecases.GetHistoryUsecase,
 			),
