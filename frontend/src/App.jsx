@@ -2,6 +2,7 @@ import "./App.css";
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import History from "./components/egts/History.jsx";
+import Header from "./components/ui/header.js";
 
 function App() {
   const [hexString, setHexString] = useState("");
@@ -16,9 +17,10 @@ function App() {
 
   return (
     <div className="app">
+      <Header></Header>
       <div className="app-header">
         <div className="text-center text-5xl font-extrabold leading-none tracking-tight m-8">
-          <span className="text-gray-900">EGTS Decode</span>
+          <span className="text-gray-700">Decode</span>
         </div>
 
         <div className="m-8">

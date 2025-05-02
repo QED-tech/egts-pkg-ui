@@ -61,6 +61,6 @@ func NewContainer() (*Container, error) {
 }
 
 func initDatabase() (*gorm.DB, error) {
-	dsn := "host=localhost user=postgres password=postgres dbname=egts port=5432 sslmode=disable TimeZone=UTC"
+	dsn := "host=db user=postgres password=postgres dbname=egts port=5432 sslmode=disable TimeZone=UTC"
 	return gorm.Open(postgresdriver.Open(dsn), &gorm.Config{})
 }

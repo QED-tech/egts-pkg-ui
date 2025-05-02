@@ -1,7 +1,6 @@
 #root {
   max-width: 1580px;
   margin: 0 auto;
-  padding: 2rem;
 }
 
 .app-header {
@@ -39,4 +38,14 @@
   font-size: large;
   cursor: pointer;
   color: rgb(61, 61, 207);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover, a:focus, a:active {
+  text-decoration: none;
+  color: inherit;
 }

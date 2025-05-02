@@ -1,4 +1,4 @@
-dev-front:
-	cd frontend && make run-dev
-dev-back:
-	cd backend && make run-dev
+up: compose-up
+
+compose-up:
+	docker compose -f ./infra/docker-compose.yml up --remove-orphans --build -d

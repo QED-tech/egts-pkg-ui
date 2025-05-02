@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/tooltip";
 import { decodeEgts } from "@/services/egts";
 import React, { useState, useEffect } from "react";
+import Header from "@/components/ui/header.js";
 
 const formatHexString = (hexString) => {
   if (hexString == "") {
@@ -35,7 +36,8 @@ const ViewParsedPgk = () => {
   }, []);
 
   return (
-    <div className="mt-5">
+    <div className="app">
+      <Header></Header>
       <table className="border border-gray-300 table-auto">
         <thead>
           <tr className="border">
