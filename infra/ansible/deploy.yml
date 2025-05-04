@@ -1,0 +1,32 @@
+---
+- name: Deploy the application
+  hosts: all
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Remove 'app' directory
+      shell: rm -rf app
+
+    - name: Create 'app' directory
+      shell: mkdir app
+
+    - name: Create and update .env file
+      shell: |
+        cd app && echo "IMAGE_TAG={{ IMAGE_TAG }}" >> .env
+
+    - name: Copy docker-compose-production.yml to 'app' directory
+      copy:
+        src: ../docker-compose-production.yml
+        dest: app/docker-compose.yml
+
+    - name: Log into DockerHub
+      docker_login:
+        username: "{{ DOCKER_LOGIN }}"
+        password: "{{ DOCKER_PASS }}"
+      no_log: true
+    - name: Pull Docker images and restart containers
+      shell: |
+        cd app \
+        && docker compose pull \
+        && docker stop $(docker ps -aq) || true \
+        && docker compose up --build --remove-orphans -d

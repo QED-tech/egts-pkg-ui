@@ -3,3 +3,5 @@
 tmp
 .vscode
 infra/.env
+infra/ansible/inventory.yml
+infra/ansible/vars/main.yml
