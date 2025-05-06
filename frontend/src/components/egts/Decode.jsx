@@ -36,59 +36,62 @@ const ViewParsedPgk = () => {
   }, []);
 
   return (
-    <div className="app">
+    <div className="app w-screen">
       <Header></Header>
-      <table className="border border-gray-300 table-auto">
-        <thead>
-          <tr className="border">
-            <th className="px-4 py-2 text-left border">Поле</th>
-            <th className="px-4 py-2 text-left border">Hex</th>
-            <th className="px-4 py-2 text-left border">Значение</th>
-            <th className="px-4 py-2 text-left border">Размер (байты)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {parsedPackage &&
-            Object.entries(parsedPackage).map(([key, value], index) => {
-              return (
-                <tr key={index} className="border-b hover:bg-gray-50">
-                  <td className="px-4 py-2 border align-top">
-                    <Tooltip key={index}>
-                      <TooltipTrigger asChild>
-                        <span className="hexField cursor-pointer text-blue-600 font-bold">
-                          {key}
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent className="overflow-scroll">
-                        <strong>Описание:</strong>{" "}
-                        <pre>{value.description}</pre>
-                      </TooltipContent>
-                    </Tooltip>
-                  </td>
-                  <td className="px-4 py-2 border align-top">
-                    <span>{formatHexString(value.hex)}</span>
-                  </td>
-                  <td className="px-4 py-2 border align-top">
-                    {key === "SFRD" ? (
-                      <JsonView
-                        value={JSON.parse(value.value)}
-                        theme={monokaiTheme}
-                        displayDataTypes={false}
-                        displayObjectSize={false}
-                        enableClipboard={true}
-                      />
-                    ) : (
-                      value.value
-                    )}
-                  </td>
-                  <td className="px-4 py-2 border align-top">
-                    {value.bytes_size}
-                  </td>
-                </tr>
-              );
-            })}
-        </tbody>
-      </table>
+
+      <div className="container mx-auto">
+        <table className="border border-gray-300 table-auto">
+          <thead>
+            <tr className="border">
+              <th className="px-4 py-2 text-left border">Поле</th>
+              <th className="px-4 py-2 text-left border">Hex</th>
+              <th className="px-4 py-2 text-left border">Значение</th>
+              <th className="px-4 py-2 text-left border">Размер (байты)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {parsedPackage &&
+              Object.entries(parsedPackage).map(([key, value], index) => {
+                return (
+                  <tr key={index} className="border-b hover:bg-gray-50">
+                    <td className="px-4 py-2 border align-top">
+                      <Tooltip key={index}>
+                        <TooltipTrigger asChild>
+                          <span className="hexField cursor-pointer text-blue-600 font-bold">
+                            {key}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent className="overflow-scroll">
+                          <strong>Описание:</strong>{" "}
+                          <pre>{value.description}</pre>
+                        </TooltipContent>
+                      </Tooltip>
+                    </td>
+                    <td className="px-4 py-2 border align-top">
+                      <span>{formatHexString(value.hex)}</span>
+                    </td>
+                    <td className="px-4 py-2 border align-top">
+                      {key === "SFRD" ? (
+                        <JsonView
+                          value={JSON.parse(value.value)}
+                          theme={monokaiTheme}
+                          displayDataTypes={false}
+                          displayObjectSize={false}
+                          enableClipboard={true}
+                        />
+                      ) : (
+                        value.value
+                      )}
+                    </td>
+                    <td className="px-4 py-2 border align-top">
+                      {value.bytes_size}
+                    </td>
+                  </tr>
+                );
+              })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

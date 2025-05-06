@@ -5,3 +5,45 @@ services:
       - "80:80"
       - "443:443"
     restart: unless-stopped
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/html:/var/www/html:ro
+
+  backend:
+    image: qedtechdocker/egts-backend:${IMAGE_TAG}
+    ports:
+      - 9090:9090
+    depends_on:
+      db:
+        condition: service_healthy
+  migrator:
+    image: qedtechdocker/egts-migrator:${IMAGE_TAG}
+    environment:
+      GOOSE_DRIVER: ${GOOSE_DRIVER}
+      GOOSE_DBSTRING: ${GOOSE_DBSTRING}
+      GOOSE_MIGRATION_DIR: ${GOOSE_MIGRATION_DIR}
+    volumes:
+      - ./migrations:/app/migrations
+    depends_on:
+      db:
+        condition: service_healthy
+    command: "goose up"
+  db:
+    image: postgres
+    restart: always
+    user: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  db-data:

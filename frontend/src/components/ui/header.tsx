@@ -1,20 +1,25 @@
 import React from "react";
-import { Link } from "react-router";
+import { NavLink } from "react-router";
 
 const Header = () => {
   return (
-    <div className="header text-gray-900 p-4">
-      <nav className="flex justify-center space-x-8">
-        <Link to="/" className="px-4 py-2 text-3xl">
+    <header className="bg-gray-800 py-1 text-white">
+      <nav className="container mx-auto flex justify-center space-x-8">
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            `px-4 py-2 text-2xl font-semibold transition duration-300 ${
+              isActive
+                ? "text-blue-600 border-b-2 border-blue-600"
+                : "text-gray-700 hover:text-blue-500"
+            }`
+          }
+        >
           Decode
-        </Link>
-        <Link to="/encode" className="px-4 py-2 rounded text-3xl">
-          Encode
-        </Link>
+        </NavLink>
       </nav>
-    </div>
+    </header>
   );
 };
 
-
-export default Header
+export default Header;

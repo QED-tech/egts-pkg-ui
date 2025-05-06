@@ -10,14 +10,25 @@
     - name: Create 'app' directory
       shell: mkdir app
 
-    - name: Create and update .env file
-      shell: |
-        cd app && echo "IMAGE_TAG={{ IMAGE_TAG }}" >> .env
+    - name: Copy 'env'
+      copy:
+        src: ../.env
+        dest: app/.env
+
+    - name: Update .env file
+      lineinfile:
+        path: app/.env
+        line: "IMAGE_TAG={{ IMAGE_TAG }}"
 
     - name: Copy docker-compose-production.yml to 'app' directory
       copy:
         src: ../docker-compose-production.yml
         dest: app/docker-compose.yml
+
+    - name: Copy 'migrations'
+      copy:
+        src: ../../backend/migrations/
+        dest: app/migrations/
 
     - name: Log into DockerHub
       docker_login:
@@ -28,5 +39,4 @@
       shell: |
         cd app \
         && docker compose pull \
-        && docker stop $(docker ps -aq) || true \
         && docker compose up --build --remove-orphans -d
