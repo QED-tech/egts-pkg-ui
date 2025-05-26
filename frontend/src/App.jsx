@@ -17,7 +17,7 @@ function App() {
   }, [hexString]);
 
   return (
-    <div className="w-screen flex flex-col h-screen justify-between">
+    <div className="w-screen flex flex-col justify-between">
       <Header></Header>
 
       <main class="container mx-auto">
